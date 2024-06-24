@@ -1,0 +1,60 @@
+﻿@page "/"
+@using BlazorApp1.BleazorLightSteramer
+@using com.lightstreamer.client
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+@code
+{
+
+	//TadbirOnlineCacheUser		
+	//TadbirOnlineCachePassword
+	private bool isLoaded = false;
+	private ConnectionInfo _cInfo;
+	protected override async Task OnInitializedAsync()
+	{
+		// Simulate data loading (replace with your actual logic)
+		await Task.Delay(1000); // Example: Wait for 1 second
+
+		// Set the flag to indicate that data is loaded
+		isLoaded = true;
+
+		connect();
+	}
+
+	public void connect()
+	{
+
+		var ls =
+	new LightstreamerClient("https://afrapush2v7.emofid.com/", "STOCKLISTDEMO_REMOTE");
+		ls.connectionDetails.User = "112&mfdonline20779828";
+		ls.connectionDetails.Password = "112";
+
+		//ls.connectionDetails.AdapterSet = "STOCKLISTDEMO_REMOTE";
+
+		string group = "112" + "_SystemMessage".ToLower();
+
+		Subscription s_stocks = new Subscription("RAW");
+		// s_stocks.ItemGroup = "";
+		s_stocks.DataAdapter = "TadbirLightPrivateGatewayAdapter";
+		s_stocks.FieldSchema = "Cache".ToLower();
+		//s_stocks.Fields = new string[3] { "last_price", "time", "stock_name" };
+		s_stocks.Items = new string[] { group };
+
+	//	s_stocks.RequestedMaxFrequency = 10 + "";
+
+		s_stocks.addListener(new QuoteListener());
+
+		ls.subscribe(s_stocks);
+
+
+
+		ls.connect();
+
+
+	}
+
+}
